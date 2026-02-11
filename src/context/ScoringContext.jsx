@@ -6,7 +6,8 @@ const initialState = {
   scores: [], // { id, comparsaId, rubroId, score, justification, timestamp, judgeId }
   user: JSON.parse(localStorage.getItem('user')) || null, // { id, name, role }
   auditLog: [], // { id, action, user, timestamp, details }
-  isLocked: false // Final lock by admin
+  isLocked: false, // Final lock by admin
+  sanciones: {} // { comparsaId: puntosSancion } - Manual 2026: Sanciones Administrativas
 };
 
 // Mock encryption function
@@ -45,6 +46,28 @@ const scoringReducer = (state, action) => {
          scores: [...state.scores, newScore],
          auditLog: [...state.auditLog, newAuditEntry]
        };
+    case 'ADD_SANCION':
+       // Manual 2026: Sanciones Administrativas
+       const sancionAudit = {
+         id: Date.now(),
+         action: 'ADD_SANCION',
+         user: state.user?.name || 'Admin',
+         timestamp: new Date().toISOString(),
+         details: `Sanción de ${action.payload.puntos} puntos aplicada a ${action.payload.comparsaId}: ${action.payload.motivo}`
+       };
+       
+       return {
+         ...state,
+         sanciones: {
+           ...state.sanciones,
+           [action.payload.comparsaId]: (state.sanciones[action.payload.comparsaId] || 0) + action.payload.puntos
+         },
+         auditLog: [...state.auditLog, sancionAudit]
+       };
+    case 'REMOVE_SANCION':
+       const newSanciones = { ...state.sanciones };
+       delete newSanciones[action.payload.comparsaId];
+       return { ...state, sanciones: newSanciones };
     default:
       return state;
   }
@@ -70,6 +93,14 @@ export const ScoringProvider = ({ children }) => {
     dispatch({ type: 'ADD_SCORE', payload: scoreData });
   };
 
+  const addSancion = (comparsaId, puntos, motivo) => {
+    dispatch({ type: 'ADD_SANCION', payload: { comparsaId, puntos, motivo } });
+  };
+
+  const removeSancion = (comparsaId) => {
+    dispatch({ type: 'REMOVE_SANCION', payload: { comparsaId } });
+  };
+
   const getScoresByComparsa = (comparsaId) => {
     return state.scores.filter(s => s.comparsaId === comparsaId);
   };
@@ -79,8 +110,29 @@ export const ScoringProvider = ({ children }) => {
     return scores.reduce((acc, curr) => acc + parseFloat(curr.score), 0).toFixed(1);
   };
 
+  const getSancion = (comparsaId) => {
+    return state.sanciones[comparsaId] || 0;
+  };
+
+  const getPuntajeNeto = (comparsaId) => {
+    const total = parseFloat(getTotalScore(comparsaId));
+    const sancion = getSancion(comparsaId);
+    return (total - sancion).toFixed(1);
+  };
+
   return (
-    <ScoringContext.Provider value={{ state, login, logout, addScore, getScoresByComparsa, getTotalScore }}>
+    <ScoringContext.Provider value={{ 
+      state, 
+      login, 
+      logout, 
+      addScore, 
+      addSancion, 
+      removeSancion, 
+      getScoresByComparsa, 
+      getTotalScore,
+      getSancion,
+      getPuntajeNeto
+    }}>
       {children}
     </ScoringContext.Provider>
   );

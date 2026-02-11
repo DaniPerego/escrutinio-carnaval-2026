@@ -15,13 +15,15 @@ const StatCard = ({ title, value, comparsa }) => (
 );
 
 const Dashboard = () => {
-  const { getTotalScore, state } = useScoring();
+  const { getTotalScore, getSancion, getPuntajeNeto, state } = useScoring();
 
-  // Calcular ranking
+  // Calcular ranking por puntaje neto (después de sanciones)
   const ranking = COMPARSAS.map(c => ({
     ...c,
-    total: parseFloat(getTotalScore(c.id))
-  })).sort((a, b) => b.total - a.total);
+    total: parseFloat(getTotalScore(c.id)),
+    sancion: getSancion(c.id),
+    neto: parseFloat(getPuntajeNeto(c.id))
+  })).sort((a, b) => b.neto - a.neto);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -92,9 +94,12 @@ const Dashboard = () => {
                       <p className={`text-sm font-bold ${comparsa.color} uppercase tracking-wide`}>{comparsa.name}</p>
                     </div>
                     <div className="flex items-baseline gap-1">
-                      <p className={`text-4xl font-black ${comparsa.color}`}>{getTotalScore(comparsa.id)}</p>
+                      <p className={`text-4xl font-black ${comparsa.color}`}>{comparsa.neto}</p>
                       <p className="text-xs text-slate-400">pts</p>
                     </div>
+                    {comparsa.sancion > 0 && (
+                      <p className="text-xs text-red-400 mt-1">-{comparsa.sancion} sanción</p>
+                    )}
                   </motion.div>
                 ))}
               </div>
@@ -141,10 +146,14 @@ const Dashboard = () => {
                      </div>
                    </td>
                    <td className="px-6 py-4 text-right font-mono text-slate-300 text-lg">{row.total}</td>
-                   <td className="px-6 py-4 text-right font-mono text-red-400">-0.0</td>
+                   <td className="px-6 py-4 text-right font-mono text-red-400">
+                     {row.sancion > 0 ? `-${row.sancion.toFixed(1)}` : '-0.0'}
+                   </td>
                    <td className="px-6 py-4 text-right">
-                     <span className={`px-4 py-2 rounded-full text-lg font-bold bg-slate-800 text-white`}>
-                         {row.total}
+                     <span className={`px-4 py-2 rounded-full text-lg font-bold ${
+                       index === 0 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-slate-800 text-white'
+                     }`}>
+                         {row.neto}
                      </span>
                    </td>
                  </tr>

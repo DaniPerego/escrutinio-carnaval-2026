@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useScoring } from '../context/ScoringContext';
 import { COMPARSAS, RUBROS } from '../constants/data';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, AlertTriangle, CheckCircle2, Trophy, TrendingUp } from 'lucide-react';
+import { Save, AlertTriangle, CheckCircle2, Trophy, TrendingUp, Info } from 'lucide-react';
+import EthicsPanel from '../components/EthicsPanel';
 
 const JudgeConsole = () => {
-  const { addScore, state, getTotalScore } = useScoring();
+  const { addScore, state, getTotalScore, getPuntajeNeto, getSancion } = useScoring();
   
   const [formData, setFormData] = useState({
     noche: 'noche1',
@@ -25,7 +26,7 @@ const JudgeConsole = () => {
   const validateScore = (val) => {
     const num = parseFloat(val);
     if (isNaN(num)) return false;
-    return num >= 7.0 && num <= 10.0;
+    return num >= 5.0 && num <= 10.0;
   };
 
   const handleChange = (e) => {
@@ -53,9 +54,9 @@ const JudgeConsole = () => {
       return;
     }
 
-    // 2. Rango
+    // 2. Rango (Manual 2026: 5.0 a 10.0)
     if (!validateScore(formData.score)) {
-      setUiState(prev => ({...prev, error: "La nota debe estar entre 7.0 y 10.0"}));
+      setUiState(prev => ({...prev, error: "La nota debe estar entre 5.0 y 10.0 (Manual 2026)"}));
       return;
     }
 
@@ -89,11 +90,13 @@ const JudgeConsole = () => {
     }, 2000);
   };
 
-  // Calcular ranking
+  // Calcular ranking por puntaje neto (Manual 2026)
   const ranking = COMPARSAS.map(c => ({
     ...c,
-    total: parseFloat(getTotalScore(c.id))
-  })).sort((a, b) => b.total - a.total);
+    total: parseFloat(getTotalScore(c.id)),
+    sancion: getSancion(c.id),
+    neto: parseFloat(getPuntajeNeto(c.id))
+  })).sort((a, b) => b.neto - a.neto);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 pt-24">
@@ -111,7 +114,10 @@ const JudgeConsole = () => {
                 <div className={`w-2 h-2 rounded-full ${comparsa.bg.replace('/10', '')}`}></div>
               </div>
               <p className={`text-sm font-medium ${comparsa.color} mb-1`}>{comparsa.name}</p>
-              <p className={`text-3xl font-black ${comparsa.color}`}>{comparsa.total}</p>
+              <p className={`text-3xl font-black ${comparsa.color}`}>{comparsa.neto}</p>
+              {comparsa.sancion > 0 && (
+                <p className="text-xs text-red-400 mt-1">-{comparsa.sancion} sanción</p>
+              )}
             </div>
           ))}
         </div>
@@ -202,6 +208,19 @@ const JudgeConsole = () => {
                         {RUBROS.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
                     </select>                    
                 </div>
+
+                {/* Guía Técnica del Rubro */}
+                <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                        <Info size={16} className="text-blue-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                            <p className="text-xs font-semibold text-blue-400 uppercase mb-1">Guía Técnica - Manual 2026</p>
+                            <p className="text-xs text-blue-200/80 leading-relaxed">
+                                {RUBROS.find(r => r.id === formData.rubroId)?.guiaTecnica}
+                            </p>
+                        </div>
+                    </div>
+                </div>
               </div>
 
               {/* Columna 2: Input de Nota */}
@@ -210,12 +229,12 @@ const JudgeConsole = () => {
                 
                 <div className="bg-slate-900/50 p-6 rounded-xl border-2 border-slate-700">
                     <label className="block text-sm font-semibold text-yellow-500 mb-3 uppercase tracking-wide">
-                        Nota (7.0 - 10.0)
+                        Nota (5.0 - 10.0) • Manual 2026
                     </label>
                     <input 
                         type="number" 
                         step="0.1" 
-                        min="7" 
+                        min="5" 
                         max="10"
                         name="score"
                         value={formData.score}
@@ -268,6 +287,11 @@ const JudgeConsole = () => {
             </button>
         </form>
         )}
+      </div>
+
+      {/* Panel de Ética y Obligaciones - Manual 2026 */}
+      <div className="mt-8">
+        <EthicsPanel />
       </div>
     </div>
   );
