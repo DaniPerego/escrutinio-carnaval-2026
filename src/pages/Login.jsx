@@ -25,27 +25,10 @@ const Login = () => {
         <div className="min-h-screen flex items-center justify-center bg-slate-950 p-4">
             <div className="glass-card w-full max-w-md p-8 rounded-2xl">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">Acceso Seguro</h1>
-                    <p className="text-slate-400">Sistema de Escrutinio 2026</p>
+                    <h1 className="text-3xl font-bold text-white mb-2">Login</h1>
                 </div>
 
                 <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                        <label className="text-sm font-medium text-slate-300 block mb-1">Rol de Usuario</label>
-                        <div className="grid grid-cols-3 gap-2 bg-slate-900 p-1 rounded-lg">
-                            {Object.values(ROLES).map((r) => (
-                                <button
-                                    key={r}
-                                    type="button"
-                                    onClick={() => setRole(r)}
-                                    className={`py-2 px-3 rounded-md text-sm font-medium capitalize transition-all ${role === r ? 'bg-slate-700 text-white shadow' : 'text-slate-500 hover:text-slate-300'}`}
-                                >
-                                    {r}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
                     <div>
                          <label className="text-sm font-medium text-slate-300 block mb-1">Identificación</label>
                          <div className="relative">
