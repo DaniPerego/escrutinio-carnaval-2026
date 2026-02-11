@@ -52,10 +52,11 @@ const Dashboard = () => {
           {/* Video de YouTube */}
           <iframe 
             className="w-full h-full"
-            src="https://www.youtube.com/embed/live_stream?channel=UCJ5v_MCY6GNUBTO8-D3XoAg&autoplay=1&mute=1"
-            title="Transmisión en Vivo - Carnaval 2026"
+            src="https://www.youtube.com/embed/M7nTd1DfL24?si=Mo4e_zDUPof95Hjn"
+            title="YouTube video player"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
           ></iframe>
 
