@@ -1,0 +1,22 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        carnaval: {
+          gold: '#FFD700',
+          dark: '#0f172a',
+          card: 'rgba(30, 41, 59, 0.7)' // Glassmorphism base
+        }
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'], 
+      }
+    },
+  },
+  plugins: [],
+}
