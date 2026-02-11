@@ -1,11 +1,12 @@
 import React from 'react';
 import { useScoring } from '../context/ScoringContext';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { LogOut, LayoutDashboard, PenTool, ShieldCheck } from 'lucide-react';
 
 const Navbar = () => {
   const { state, logout } = useScoring();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -61,13 +62,15 @@ const Navbar = () => {
             </div>
           </>
         ) : (
-          <NavLink 
-            to="/login" 
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 transition-colors font-medium"
-          >
-            <ShieldCheck size={18} />
-            Acceso Jurados
-          </NavLink>
+          location.pathname !== '/login' && (
+            <NavLink 
+              to="/login" 
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20 transition-colors font-medium"
+            >
+              <ShieldCheck size={18} />
+              Acceso
+            </NavLink>
+          )
         )}
       </div>
     </nav>
