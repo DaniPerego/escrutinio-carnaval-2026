@@ -5,6 +5,7 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
+  base: '/escrutinio-carnaval-2026/',
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
